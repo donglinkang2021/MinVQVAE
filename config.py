@@ -1,8 +1,8 @@
 # model
 model_name = 'VQVAE'
 
-# in_channel=3
-in_channel=1
+in_channel=3
+# in_channel=1
 hid_channel=128
 n_res_block=2
 n_res_channel=32
@@ -21,11 +21,14 @@ model_kwargs = {
 }
 
 # dataset
-dataset_name = 'MNIST'
+# dataset_name = 'MNIST'
 # dataset_name = 'CIFAR10'
+# dataset_name = 'ImageNet'
+# dataset_name = 'CelebA'
+dataset_name = 'Places365'
 
-image_size = 64
-data_dir = 'data'
+image_size = 224
+data_dir = '/opt/data/private/linkdom/data'
 batch_size = 256
 num_workers = 4
 

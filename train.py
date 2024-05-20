@@ -3,7 +3,7 @@ import lightning as L
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.strategies import DeepSpeedStrategy
 from light import VQVAELightning
-from datasets import MNISTDataModule, CIFAR10DataModule
+from datasets import *
 from config import *
 
 torch.set_float32_matmul_precision('medium')
@@ -14,6 +14,12 @@ if __name__ == '__main__':
         dm = CIFAR10DataModule(**dataset_kwargs)
     elif dataset_name == 'MNIST':
         dm = MNISTDataModule(**dataset_kwargs)
+    elif dataset_name == 'ImageNet':
+        dm = ImageNetDataModule(**dataset_kwargs)
+    elif dataset_name == 'CelebA':
+        dm = CelebADataModule(**dataset_kwargs)
+    elif dataset_name == 'Places365':
+        dm = Places365DataModule(**dataset_kwargs)
 
     model = VQVAELightning(model_kwargs, vis_kwargs, learning_rate)
 
