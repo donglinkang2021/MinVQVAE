@@ -1,3 +1,5 @@
 .hypothesis
 data
 __pycache__
+logs
+*.log

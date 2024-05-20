@@ -1,87 +1,32 @@
 import torch
-import torch.nn as nn
-from torch.optim.optimizer import Optimizer
-from torchvision import transforms
-from torchvision.datasets import MNIST
-from torch.utils.data import DataLoader
-from tqdm import tqdm
+import lightning as L
+from lightning.pytorch.loggers import TensorBoardLogger
+from lightning.pytorch.strategies import DeepSpeedStrategy
+from light import VQVAELightning
+from datasets import MNISTDataModule
 from config import *
 
-def get_datasets():
-    transform = transforms.Compose([
-        transforms.Resize((image_size, image_size)),
-        transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,))
-    ])
-
-    train_dataset = MNIST(root='./data', train=True, download=True, transform=transform)
-    test_dataset = MNIST(root='./data', train=False, download=True, transform=transform)
-    return train_dataset, test_dataset
-
-def get_loader(train_dataset, test_dataset, batch_size):
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-    return train_loader, test_loader
-
-def train(
-        model:nn.Module, 
-        train_loader:DataLoader, 
-        optimizer:Optimizer, 
-        criterion:nn.Module,
-        device:torch.device
-    ) -> None:
-    model.train()
-    pbar = tqdm(total=len(train_loader), desc='Training', dynamic_ncols=True, leave=False)
-    for data, _ in train_loader:
-        data = data.to(device)
-        optimizer.zero_grad()
-        output, idxs = model(data)
-        loss = criterion(output, data)
-        loss.backward()
-        optimizer.step()
-        pbar.set_postfix({'loss': loss.item()})
-        pbar.update(1)
-    pbar.close()
-
-@torch.no_grad()
-def evaluate(
-        model:nn.Module, 
-        test_loader:DataLoader, 
-        criterion:Optimizer,
-        device:torch.device
-    ) -> dict:
-    model.eval()
-    metrics = {}
-    running_loss = 0.0
-    for data, _ in test_loader:
-        data = data.to(device)
-        output, idxs = model(data)
-        loss = criterion(output, data)
-        running_loss += loss.item()
-    metrics['val loss'] = running_loss / len(test_loader)
-    return metrics
-
-def main():
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    train_dataset, test_dataset = get_datasets()
-
-    train_loader, test_loader = get_loader(train_dataset, test_dataset, batch_size)
-
-    from vqvae import VQVAE
-    model = VQVAE(**model_kwargs).to(device)
-    criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    pbar = tqdm(total=epochs, desc='Epochs', dynamic_ncols=True)
-    for _ in range(epochs):
-        train(model, train_loader, optimizer, criterion, device)
-        metrics = evaluate(model, test_loader, criterion, device)
-        pbar.set_postfix(metrics)
-        pbar.update(1)
-    pbar.close()
+torch.set_float32_matmul_precision('medium')
 
 if __name__ == '__main__':
-    main()
 
-# Epochs: 100%|██████| 10/10 [02:01<00:00, 12.15s/it, val loss=0.0912]
+    dm = MNISTDataModule(**dataset_kwargs)
+
+    model = VQVAELightning(model_kwargs, vis_kwargs, learning_rate)
+
+    logger = TensorBoardLogger("logs", name=f"{model_name}_{dataset_name}")
+    
+    trainer = L.Trainer(
+        accelerator="gpu",
+        strategy=DeepSpeedStrategy(),
+        devices=[0, 1],
+        # precision="16-mixed",
+        precision=64,
+        logger=logger,
+        num_nodes=1,
+        max_epochs=epochs,
+        profiler="simple"
+    )
+    trainer.fit(model, dm)
+    trainer.validate(model, dm)
+    trainer.test(model, dm)

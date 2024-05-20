@@ -1,3 +1,6 @@
+# model
+model_name = 'VQVAE'
+
 in_channel=1
 hid_channel=128
 n_res_block=2
@@ -15,9 +18,28 @@ model_kwargs = {
 }
 
 # dataset
+dataset_name = 'MNIST'
+
 image_size = 32
+data_dir = 'data'
+batch_size = 512
+num_workers = 4
+
+dataset_kwargs = {
+    'data_dir': data_dir,
+    'batch_size': batch_size,
+    'num_workers': num_workers,
+    'image_size': image_size
+}
 
 # Training
-batch_size = 512
 learning_rate = 3e-4
 epochs = 10
+
+# lightning visulization
+
+vis_kwargs = {
+    'n_sample': 32,
+    'size': image_size,
+    'in_channel': in_channel
+}
