@@ -1,7 +1,8 @@
 # model
 model_name = 'VQVAE'
 
-in_channel=3
+# in_channel=3
+in_channel=1
 hid_channel=128
 n_res_block=2
 n_res_channel=32
@@ -20,10 +21,10 @@ model_kwargs = {
 }
 
 # dataset
-# dataset_name = 'MNIST'
-dataset_name = 'CIFAR10'
+dataset_name = 'MNIST'
+# dataset_name = 'CIFAR10'
 
-image_size = 224
+image_size = 64
 data_dir = 'data'
 batch_size = 256
 num_workers = 4
