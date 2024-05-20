@@ -3,14 +3,17 @@ import lightning as L
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.strategies import DeepSpeedStrategy
 from light import VQVAELightning
-from datasets import MNISTDataModule
+from datasets import MNISTDataModule, CIFAR10DataModule
 from config import *
 
 torch.set_float32_matmul_precision('medium')
 
 if __name__ == '__main__':
 
-    dm = MNISTDataModule(**dataset_kwargs)
+    if dataset_name == 'CIFAR10':
+        dm = CIFAR10DataModule(**dataset_kwargs)
+    elif dataset_name == 'MNIST':
+        dm = MNISTDataModule(**dataset_kwargs)
 
     model = VQVAELightning(model_kwargs, vis_kwargs, learning_rate)
 
@@ -21,7 +24,7 @@ if __name__ == '__main__':
         strategy=DeepSpeedStrategy(),
         devices=[0, 1],
         # precision="16-mixed",
-        precision=64,
+        precision=32,
         logger=logger,
         num_nodes=1,
         max_epochs=epochs,

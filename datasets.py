@@ -6,19 +6,25 @@ from torch.utils.data import DataLoader
 import lightning as L
 
 class CIFAR10DataModule(L.LightningDataModule):
-    def __init__(self, data_dir, batch_size, num_workers):
+    def __init__(
+            self, 
+            data_dir:str, 
+            batch_size:int, 
+            num_workers:int, 
+            image_size:int
+        ):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.transform_train = transforms.Compose([
-            transforms.Resize((224, 224)),
+            transforms.Resize((image_size, image_size)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomVerticalFlip(),
-            transforms.ToTensor()
+            transforms.ToTensor(),
         ])
         self.transform_test = transforms.Compose([
-            transforms.Resize((224, 224)),
+            transforms.Resize((image_size, image_size)),
             transforms.ToTensor()
         ])
     
@@ -76,7 +82,13 @@ class CIFAR10DataModule(L.LightningDataModule):
         )
     
 class MNISTDataModule(L.LightningDataModule):
-    def __init__(self, data_dir, batch_size, num_workers, image_size):
+    def __init__(
+            self, 
+            data_dir:str, 
+            batch_size:int, 
+            num_workers:int, 
+            image_size:int
+        ):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size

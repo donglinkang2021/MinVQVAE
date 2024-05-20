@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch import Tensor
-from quantize import SimpleQuantize
+from quantize import SimpleQuantize, VectorQuantize
 from einops import rearrange
 from typing import Tuple
 
@@ -149,9 +149,13 @@ class VQVAE(nn.Module):
             n_res_channel
         )
         self.enc_out = nn.Conv2d(hid_channel, embed_dim, 1)
-        self.quantize = SimpleQuantize(
-            vocab_size=n_embed, 
-            embd_dim=embed_dim
+        # self.quantize = SimpleQuantize(
+        #     vocab_size=n_embed, 
+        #     embd_dim=embed_dim
+        # )
+        self.quantize = VectorQuantize(
+            v_cluster=n_embed, 
+            n_embed=embed_dim
         )
         self.dec_in = nn.Conv2d(embed_dim, hid_channel, 1)
         self.decoder = Decoder(
@@ -169,13 +173,14 @@ class VQVAE(nn.Module):
         # enc: (B, hid_channel, H//4, W//4) 
         # -> enc: (B, H//4, W//4, embed_dim)        
         enc = self.enc_out(enc)
-        enc = rearrange(enc, 'b c h w -> b h w c')
+        _, _, H, W = enc.shape
+        enc = rearrange(enc, 'b c h w -> b (h w) c')
         
         quant, idxs = self.quantize(enc)
 
         # quant: (B, H//4, W//4, embed_dim)
         # -> quant: (B, hid_channel, H//4, W//4)
-        quant = rearrange(quant, 'b h w c -> b c h w')
+        quant = rearrange(quant, 'b (h w) c -> b c h w', h=H, w=W)
         quant = self.dec_in(quant)
 
         # quant: (B, hid_channel, H//4, W//4)
