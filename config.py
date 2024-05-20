@@ -7,6 +7,7 @@ n_res_block=2
 n_res_channel=32
 embed_dim=64
 n_embed=512
+scale_factor=1
 
 model_kwargs = {
     'in_channel': in_channel,
@@ -14,7 +15,8 @@ model_kwargs = {
     'n_res_block': n_res_block,
     'n_res_channel': n_res_channel,
     'embed_dim': embed_dim,
-    'n_embed': n_embed
+    'n_embed': n_embed,
+    'scale_factor': scale_factor
 }
 
 # dataset

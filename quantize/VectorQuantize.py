@@ -26,17 +26,9 @@ class VectorQuantize(nn.Module):
         # codes: [B, T]
 
         # this implementation is not memory efficient
-        # flatten = input.reshape(-1, self.n_embed)                                       # [B*T, n_embed]
-        # codes_onehot = F.one_hot(codes.reshape(-1), self.v_cluster).type(flatten.dtype) # [B*T, v_cluster]
-        # codebook = codes_onehot.transpose(0, 1) @ flatten                               # [v_cluster, n_embed]
-
-        # this implementation is memory efficient
-        codes_onehot = F.one_hot(codes, self.v_cluster).type(input.dtype)               # [B, T, v_cluster]
-        input = input.permute(1, 0, 2)                                                  # [T, B, n_embed]
-        codes_onehot = codes_onehot.permute(1, 0, 2)                                    # [T, B, v_cluster]
-        codebook = codes_onehot.transpose(1, 2) @ input                                 # [T, v_cluster, n_embed]
-        codebook = codebook.mean(0)
-        codes_onehot = codes_onehot.reshape(-1, self.v_cluster)                         # [B*T, v_cluster]
+        flatten = input.reshape(-1, self.n_embed)                                       # [B*T, n_embed]
+        codes_onehot = F.one_hot(codes.reshape(-1), self.v_cluster).type(flatten.dtype) # [B*T, v_cluster]
+        codebook = codes_onehot.transpose(0, 1) @ flatten                               # [v_cluster, n_embed]
 
         # update
         self.cluster_size = self.cluster_size * self.decay + codes_onehot.sum(0) * (1 - self.decay)
@@ -66,8 +58,8 @@ class VectorQuantize(nn.Module):
 
 if __name__ == "__main__":
     torch.manual_seed(1337)
-    B = 2
-    T = 100
+    B = 256
+    T = 28 * 28
     embd_dim = 128
     vocab_size = 32
     input = torch.randn(B, T, embd_dim, requires_grad=True)
