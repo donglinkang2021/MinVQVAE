@@ -48,7 +48,7 @@ class Encoder(nn.Module):
             nn.Conv2d(
                 in_channel, 
                 hid_channel // 2, 
-                kernel_size=3, 
+                kernel_size=4, 
                 stride=2, 
                 padding=1
             ),
@@ -56,7 +56,7 @@ class Encoder(nn.Module):
             nn.Conv2d(
                 hid_channel // 2, 
                 hid_channel, 
-                kernel_size=3, 
+                kernel_size=4, 
                 stride=2, 
                 padding=1
             ),
@@ -109,7 +109,7 @@ class Decoder(nn.Module):
                 nn.ConvTranspose2d(
                     hid_channel, 
                     hid_channel // 2, 
-                    kernel_size=3, 
+                    kernel_size=4, 
                     stride=2, 
                     padding=1
                 ),
@@ -117,7 +117,7 @@ class Decoder(nn.Module):
                 nn.ConvTranspose2d(
                     hid_channel // 2, 
                     out_channel, 
-                    kernel_size=3, 
+                    kernel_size=4, 
                     stride=2, 
                     padding=1
                 ),
