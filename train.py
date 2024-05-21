@@ -2,7 +2,7 @@ import torch
 import lightning as L
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.strategies import DeepSpeedStrategy
-from light import VQVAELightning
+from light import *
 from datasets import *
 from config import *
 
@@ -15,7 +15,10 @@ if __name__ == '__main__':
     elif dataset_name == 'MNIST':
         dm = MNISTDataModule(**dataset_kwargs)
 
-    model = VQVAELightning(model_kwargs, vis_kwargs, mask_kwargs, learning_rate)
+    if model_name == 'VQVAE':
+        model = VQVAELightning(model_kwargs, vis_kwargs, mask_kwargs, learning_rate)
+    elif model_name == 'SQATE':
+        model = SQATELightning(model_kwargs, transformer_kwargs, vis_kwargs, mask_kwargs, learning_rate)
 
     logger = TensorBoardLogger("logs", name=f"{model_name}_{dataset_name}")
     

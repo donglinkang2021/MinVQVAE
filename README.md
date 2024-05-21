@@ -6,9 +6,13 @@ Minimal Discrete Variational Autoencoder (VQ-VAE) implementation in PyTorch.
 
 ## Performance
 
-| Masked(50%) Test Set  | Unmasked Reconstruct(10 epoch) | Masked Reconstruct(10 epoch) | Masked Reconstruct(20 epoch) |
-|-----------------|--------------|----------------|-----------------|
-| ![mask](images/mask.png) | ![unmask_recon](images/unmask_recon.png) | ![mask_recon_10](images/mask_recon_10.png) | ![mask_recon_20](images/mask_recon_20.png) |
+| Original | Masked(50%) Test Set | Unmasked Reconstruct(10 epoch) |
+|----------|----------------------|--------------------------------|
+| ![origin](images/origin.png) | ![mask](images/mask.png) | ![unmask_recon](images/unmask_recon.png) |
+
+| Masked Reconstruct(10 epoch) | Masked Reconstruct(20 epoch) | Masked+Transformer Reconstruct(20 epoch) |
+|-----------------------------|-----------------------------|-----------------------------------------|
+| ![mask_recon_10](images/mask_recon_10.png) | ![mask_recon_20](images/mask_recon_20.png) | ![mask_trans_recon](images/mask_trans_recon.png) |
 
 - 777K unmasked VQVAE with `SoftQuantize` of my implementation
     - get `0.0002233` MSE Loss on CIFAR-10 test set
@@ -16,6 +20,8 @@ Minimal Discrete Variational Autoencoder (VQ-VAE) implementation in PyTorch.
 - 777K patch_masked(50%) VQVAE with `SoftQuantize` 
     - `0.0092147` MSE Loss on CIFAR-10 test set training 10 epochs cost 13 min
     - `0.00754284` training 20 epochs cost 23 min
+- 1.1M patch_masked(50%) VQVAE+transformer with `SoftQuantize` 
+    - `0.005134001` MSE Loss on CIFAR-10 test set training 20 epochs cost 49 min
 
 ## Others
 
@@ -46,9 +52,16 @@ Minimal Discrete Variational Autoencoder (VQ-VAE) implementation in PyTorch.
 | [Strategy]DeepSpeedStrategy.validation_step                             |  1.8193             |  422                   |  767.76               |  55.156               |
 | run_training_batch                                                      |  0.23081            |  1580                  |  364.68               |  26.198               |
 
-- Cifar10 and Mnist Reconstruction of Unmasked VQ-VAE
+- profile of trainning masked VQ-VAE+transformer 20 epoch
 
-![performance](images/performance.png)
+| Action                                                                  |  Mean duration (s)  |  Num calls             |  Total time (s)       |  Percentage %         |
+|-------------------------------------------------------------------------|---------------------|------------------------|------------------------|-----------------------|
+| Total                                                                   |  -                  |  63874                 |  2980.1               |  100 %                |
+| run_training_epoch                                                      |  143.01             |  20                    |  2860.2               |  95.977               |
+| run_training_batch                                                      |  1.1792             |  1580                  |  1863.2               |  62.522               |
+| [LightningModule]SQATELightning.optimizer_step                           |  1.1791             |  1580                  |  1863.0               |  62.515               |
+| [Strategy]DeepSpeedStrategy.backward                                     |  1.1492             |  1580                  |  1815.7               |  60.927               |
+| [Strategy]DeepSpeedStrategy.validation_step                              |  2.0247             |  422                   |  854.44               |  28.672               |
 
 ## TODO
 

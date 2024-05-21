@@ -6,7 +6,14 @@ from quantize import SoftQuantize
 from einops import rearrange
 from typing import Tuple
 
-__all__ = ['VQVAE']
+__all__ = [
+    'VQVAE', 
+    'Encoder', 
+    'Decoder', 
+    'ResBlock', 
+    'SubSampleBlock', 
+    'SubsampleTransposeBlock'
+]
 
 class ResBlock(nn.Module):
     def __init__(self, in_channel:int, _channel:int):

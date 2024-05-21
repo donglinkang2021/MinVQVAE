@@ -1,5 +1,6 @@
 # model
-model_name = 'VQVAE'
+# model_name = 'VQVAE'
+model_name = 'SQATE'
 
 in_channel=3
 # in_channel=1
@@ -18,6 +19,14 @@ model_kwargs = {
     'embed_dim': embed_dim,
     'n_embed': n_embed,
     'scale_factor': scale_factor
+}
+
+transformer_kwargs = {
+    'n_embd': embed_dim,
+    'n_head': 8,
+    'n_layer': 2,
+    'block_size': 3600,
+    'dropout': 0.1
 }
 
 # dataset
