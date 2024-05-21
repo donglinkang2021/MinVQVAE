@@ -38,7 +38,7 @@ dataset_kwargs = {
 
 # Training
 learning_rate = 3e-4
-epochs = 10
+epochs = 20
 
 # lightning visulization
 
