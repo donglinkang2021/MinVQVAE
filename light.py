@@ -9,7 +9,13 @@ from mask import patch_mask
 __all__ = ['VQVAELightning', 'SQATELightning']
 
 class VQVAELightning(L.LightningModule):
-    def __init__(self, model_kwargs:dict, vis_kwargs:dict, mask_kwargs, lr:float):
+    def __init__(
+            self, 
+            model_kwargs:dict, 
+            vis_kwargs:dict, 
+            # mask_kwargs, 
+            lr:float
+        ):
         super().__init__()
         self.save_hyperparameters()
         self.vqvae = VQVAE(**model_kwargs)
@@ -60,7 +66,8 @@ class VQVAELightning(L.LightningModule):
 
     def _common_step(self, batch, batch_idx):
         data, target = batch
-        data_masked = patch_mask(data, **self.hparams.mask_kwargs)
+        # data_masked = patch_mask(data, **self.hparams.mask_kwargs)
+        data_masked = None
         logits = self(data_masked)
         loss = self.loss_fn(logits, data)
         return loss, logits, data, data_masked
