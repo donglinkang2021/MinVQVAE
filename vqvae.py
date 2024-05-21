@@ -142,11 +142,8 @@ class Decoder(nn.Module):
         blocks = []
         for _ in range(n_res_block):
             blocks.append(ResBlock(hid_channel, n_res_channel))
-
         blocks.append(nn.ReLU(inplace=True))
-
         blocks.append(SubsampleTransposeBlock(hid_channel, out_channel, scale_factor))
-
         self.blocks = nn.Sequential(*blocks)
 
     def forward(self, input:Tensor) -> Tensor:
