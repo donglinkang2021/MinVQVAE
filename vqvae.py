@@ -12,7 +12,8 @@ __all__ = [
     'Decoder', 
     'ResBlock', 
     'SubSampleBlock', 
-    'SubsampleTransposeBlock'
+    'SubsampleTransposeBlock',
+    'Classifier'
 ]
 
 class ResBlock(nn.Module):
@@ -214,6 +215,23 @@ class VQVAE(nn.Module):
         dec = self.decoder(quant)
         return dec, idxs
 
+class Classifier(nn.Module):
+    def __init__(self, in_channel, n_classes):
+        super().__init__()
+        self.subsample = SubSampleBlock(in_channel, 4 * in_channel, 1)
+        self.pool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(4 * in_channel, n_classes)
+
+    def forward(self, x):
+        # x: (B, in_channel, H, W)
+        # -> (B, 4 * in_channel, H // 4, W // 4)
+        x = self.subsample(x)
+        # -> (B, 4 * in_channel, 1, 1)
+        x = self.pool(x)
+        # -> (B, 4 * in_channel)
+        x = x.view(x.size(0), -1)
+        # -> (B, n_classes)
+        return self.fc(x)
 
 if __name__ == '__main__':
     model = VQVAE(

@@ -1,6 +1,7 @@
 # model
 # model_name = 'VQVAE'
-model_name = 'SQATE'
+# model_name = 'SQATE'
+model_name = 'VQVAE_finetune'
 
 in_channel=3
 # in_channel=1
@@ -47,7 +48,7 @@ dataset_kwargs = {
 
 # Training
 learning_rate = 3e-4
-epochs = 20
+epochs = 10
 
 # lightning visulization
 
