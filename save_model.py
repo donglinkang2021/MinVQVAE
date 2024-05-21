@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     # lightning deepspeed has saved a directory instead of a file
     save_path = "logs/VQVAE_CIFAR10/version_8/checkpoints/epoch=9-step=790.ckpt"
-    output_path = "ckpt/VQVAE_CIFAR10.pt"
+    output_path = "ckpt/VQVAE_CIFAR10_lightning.pt"
     convert_zero_checkpoint_to_fp32_state_dict(save_path, output_path)
 
     model = VQVAELightning.load_from_checkpoint(
@@ -23,4 +23,4 @@ if __name__ == '__main__':
     )
     vqvae = VQVAE(**model_kwargs)
     vqvae.load_state_dict(model.vqvae.state_dict())
-    torch.save(vqvae, "ckpt/unmask_vqvae_cifar10_10epo.pth")
+    torch.save(vqvae.state_dict(), "ckpt/unmask_vqvae_cifar10_10epo.pth")

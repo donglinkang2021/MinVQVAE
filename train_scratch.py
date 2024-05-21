@@ -47,7 +47,7 @@ def train(
 def evaluate(
         model:nn.Module, 
         test_loader:DataLoader, 
-        criterion:Optimizer,
+        criterion:nn.Module,
         device:torch.device
     ) -> dict:
     model.eval()
