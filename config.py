@@ -22,10 +22,7 @@ model_kwargs = {
 
 # dataset
 # dataset_name = 'MNIST'
-# dataset_name = 'CIFAR10'
-# dataset_name = 'ImageNet'
-# dataset_name = 'CelebA'
-dataset_name = 'Places365'
+dataset_name = 'CIFAR10'
 
 image_size = 224
 data_dir = '/opt/data/private/linkdom/data'
@@ -49,4 +46,13 @@ vis_kwargs = {
     'n_sample': 32,
     'size': image_size,
     'in_channel': in_channel
+}
+
+# mask
+
+mask_prob = 0.5
+patch_size = 32
+mask_kwargs = {
+    'mask_prob': mask_prob,
+    'patch_size': patch_size
 }
