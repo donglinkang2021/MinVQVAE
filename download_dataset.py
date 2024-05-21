@@ -1,4 +1,4 @@
-from torchvision.datasets import Places365
+from torchvision.datasets import CelebA
 data_dir = '/opt/data/private/linkdom/data'
-Places365(root=data_dir, split='train-standard', download=True)
-Places365(root=data_dir, split='val', download=True)
+CelebA(root=data_dir, split='train', download=True)
+CelebA(root=data_dir, split='val', download=True)

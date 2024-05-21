@@ -1,3 +1,6 @@
+# download data
+nohup python download_dataset.py > download.log 2>&1 &
+
 # train model
 nohup python train.py > train.log 2>&1 &
 

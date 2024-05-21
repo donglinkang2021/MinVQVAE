@@ -18,3 +18,12 @@ Minimal Discrete Variational Autoencoder (VQ-VAE) implementation in PyTorch.
 | run_training_epoch                                                      |  56.897             |  10                    |  568.97               |  85.708               |
 | [Strategy]DeepSpeedStrategy.validation_step                             |  1.4723             |  222                   |  326.84               |  49.235               |
 | run_training_batch                                                      |  0.22579            |  790                   |  178.37               |  26.869               |
+
+## TODO
+
+> To be honest, I'm not sure if I will continue to work on this project. I'm just trying to implement a VQ-VAE for fun. If you have any questions, please feel free to ask me.
+
+- [ ] Test it on some large dataset, like
+    - ImageNet
+    - CelebA (or CelebA-HQ)
+    - Places365
