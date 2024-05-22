@@ -264,7 +264,8 @@ class CelebADataModule(L.LightningDataModule):
     def prepare_data(self):
         # single gpu
         CelebA(root=self.data_dir, split='train', download=True)
-        CelebA(root=self.data_dir, split='val', download=True)
+        CelebA(root=self.data_dir, split='valid', download=True)
+        CelebA(root=self.data_dir, split='test', download=False)
         
     
     def setup(self, stage=None):
@@ -277,7 +278,7 @@ class CelebADataModule(L.LightningDataModule):
         )
         self.valid_set = CelebA(
             root=self.data_dir, 
-            split='val', 
+            split='valid', 
             transform=self.transform_test, 
             download=False
         )

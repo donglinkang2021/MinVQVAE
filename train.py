@@ -14,8 +14,16 @@ if __name__ == '__main__':
         dm = CIFAR10DataModule(**dataset_kwargs)
     elif dataset_name == 'MNIST':
         dm = MNISTDataModule(**dataset_kwargs)
+    elif dataset_name == 'CelebA':
+        dm = CelebADataModule(**dataset_kwargs)
 
-    if model_name == 'VQVAE':
+    if model_name == 'VQVAE_unmask':
+        model = VQVAEUnmaskLightning(
+            model_kwargs, 
+            vis_kwargs, 
+            learning_rate
+        )
+    elif model_name == 'VQVAE':
         model = VQVAELightning(
             model_kwargs, 
             vis_kwargs, 
@@ -48,7 +56,7 @@ if __name__ == '__main__':
     trainer = L.Trainer(
         accelerator="gpu",
         strategy=DeepSpeedStrategy(),
-        devices=[0, 1],
+        devices=[0],
         # precision="16-mixed",
         precision=32,
         logger=logger,
