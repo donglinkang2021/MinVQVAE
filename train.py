@@ -16,6 +16,8 @@ if __name__ == '__main__':
         dm = MNISTDataModule(**dataset_kwargs)
     elif dataset_name == 'CelebA':
         dm = CelebADataModule(**dataset_kwargs)
+    elif dataset_name == 'ImageNet':
+        dm = ImageNetDataModule(**dataset_kwargs)
 
     if model_name == 'VQVAE_unmask':
         model = VQVAEUnmaskLightning(
@@ -56,7 +58,7 @@ if __name__ == '__main__':
     trainer = L.Trainer(
         accelerator="gpu",
         strategy=DeepSpeedStrategy(),
-        devices=[0],
+        devices=4,
         # precision="16-mixed",
         precision=32,
         logger=logger,

@@ -10,7 +10,6 @@ __all__ = [
     "MNISTDataModule",
     "ImageNetDataModule",
     "CelebADataModule",
-    "Places365DataModule"
 ]
 
 class CIFAR10DataModule(L.LightningDataModule):
@@ -181,8 +180,8 @@ class ImageNetDataModule(L.LightningDataModule):
     
     def prepare_data(self):
         # single gpu
-        ImageNet(root=self.data_dir, split='train', download=True)
-        ImageNet(root=self.data_dir, split='val', download=True)
+        ImageNet(root=self.data_dir, split='train')
+        ImageNet(root=self.data_dir, split='val')
         
     
     def setup(self, stage=None):
@@ -191,13 +190,11 @@ class ImageNetDataModule(L.LightningDataModule):
             root=self.data_dir, 
             split='train', 
             transform=self.transform, 
-            download=False
         )
         self.test_set = ImageNet(
             root=self.data_dir, 
             split='val', 
             transform=self.transform, 
-            download=False
         )
         train_set_size = int(len(entire_dataset) * 0.8)
         valid_set_size = len(entire_dataset) - train_set_size

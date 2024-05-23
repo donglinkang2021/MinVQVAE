@@ -34,11 +34,13 @@ transformer_kwargs = {
 # dataset
 # dataset_name = 'MNIST'
 # dataset_name = 'CIFAR10'
-dataset_name = 'CelebA'
+# dataset_name = 'CelebA'
+dataset_name = 'ImageNet'
 
 image_size = 224
-data_dir = '/root/autodl-tmp/'
-batch_size = 256
+# data_dir = '/root/autodl-tmp/'
+data_dir = "/root/autodl-tmp/imagenet/"
+batch_size = 512
 num_workers = 4
 
 dataset_kwargs = {
