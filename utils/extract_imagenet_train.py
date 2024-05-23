@@ -43,5 +43,6 @@ def extract_val(src:str, dest:str):
 
 if __name__ == '__main__':
     extract_train() # 137.7 GB cost 15:23
-    extract_val(VAL_SRC_DIR, VAL_DEST_DIR) # 6.28 GB cost 4:41
-    extract_val(TEST_SRC_DIR, TEST_DEST_DIR) # 12.74 GB cost 17:00
+    # use utils/extract_imagenet_val.py to extract val set
+    # extract_val(VAL_SRC_DIR, VAL_DEST_DIR) # 6.28 GB cost 4:41
+    # extract_val(TEST_SRC_DIR, TEST_DEST_DIR) # 12.74 GB cost 17:00

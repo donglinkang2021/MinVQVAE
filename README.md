@@ -96,4 +96,3 @@ Minimal Discrete Variational Autoencoder (VQ-VAE) implementation in PyTorch.
 - [ ] Test it on some large dataset, like
     - ImageNet
     - [x] CelebA (or CelebA-HQ)
-    - Places365
