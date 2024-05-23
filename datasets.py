@@ -173,15 +173,10 @@ class ImageNetDataModule(L.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.image_size = image_size
-        self.transform_train = transforms.Compose([
-            transforms.Resize((image_size, image_size)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
+        self.transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(image_size),
             transforms.ToTensor(),
-        ])
-        self.transform_test = transforms.Compose([
-            transforms.Resize((image_size, image_size)),
-            transforms.ToTensor()
         ])
     
     def prepare_data(self):
@@ -195,13 +190,13 @@ class ImageNetDataModule(L.LightningDataModule):
         entire_dataset = ImageNet(
             root=self.data_dir, 
             split='train', 
-            transform=self.transform_train, 
+            transform=self.transform, 
             download=False
         )
         self.test_set = ImageNet(
             root=self.data_dir, 
             split='val', 
-            transform=self.transform_test, 
+            transform=self.transform, 
             download=False
         )
         train_set_size = int(len(entire_dataset) * 0.8)

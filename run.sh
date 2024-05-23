@@ -1,3 +1,6 @@
+# download data
+nohup python utils/extract_imagenet.py > download.log 2>&1 &
+
 # train model
 nohup python train.py > train.log 2>&1 &
 

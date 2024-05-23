@@ -21,7 +21,7 @@ def extract_train():
             class_path = f"{TRAIN_DEST_DIR}/{cls_name}/"
             if not os.path.isdir(class_path):
                 os.makedirs(class_path)
-            pbar.set_postfix({">>> ",class_path})
+            pbar.set_postfix_str(f"Extracting {cls_name}")
             b.extractall(class_path)
             pbar.update(1)
         pbar.close()
@@ -34,11 +34,14 @@ def extract_val(src:str, dest:str):
             os.makedirs(dest)
         print("extract val dateset to >>>", dest)
         names = tar.getnames()
+        pbar = tqdm(total=len(names), desc='Extracting val dataset', dynamic_ncols=True)
         for name in names:
             tar.extract(name, dest)
+            pbar.update(1)
+        pbar.close()
 
 
 if __name__ == '__main__':
-    extract_train() # 137.7 GB
-    extract_val(VAL_SRC_DIR, VAL_DEST_DIR) # 6.28 GB
-    extract_val(TEST_SRC_DIR, TEST_DEST_DIR) # 12.74 GB
+    extract_train() # 137.7 GB cost 15:23
+    extract_val(VAL_SRC_DIR, VAL_DEST_DIR) # 6.28 GB cost 4:41
+    extract_val(TEST_SRC_DIR, TEST_DEST_DIR) # 12.74 GB cost 17:00
