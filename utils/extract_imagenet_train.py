@@ -1,48 +1,34 @@
-import os
+# for faster extraction, use ThreadPoolExecutor
+
 import tarfile
+from pathlib import Path
 from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
 
-TRAIN_SRC_DIR = '/root/autodl-pub/ImageNet/ILSVRC2012/ILSVRC2012_img_train.tar'
-TRAIN_DEST_DIR = '/root/autodl-tmp/imagenet/train'
-VAL_SRC_DIR = '/root/autodl-pub/ImageNet/ILSVRC2012/ILSVRC2012_img_val.tar'
-VAL_DEST_DIR = '/root/autodl-tmp/imagenet/val'
-TEST_SRC_DIR = '/root/autodl-pub/ImageNet/ILSVRC2012/ILSVRC2012_img_test.tar'
-TEST_DEST_DIR = '/root/autodl-tmp/imagenet/test'
+TRAIN_SRC_DIR = '/data1/linkdom/archive/ImageNet/ILSVRC2012/ILSVRC2012_img_train.tar'
+TRAIN_DEST_DIR = '/data1/linkdom/data/imagenet1/train'
 
-def extract_train():
+def extract_train(max_workers=8):
     with open(TRAIN_SRC_DIR, 'rb') as f:
         tar = tarfile.open(fileobj=f, mode='r:')
-        total_files = len(tar.getmembers())
-        pbar = tqdm(total=total_files, desc='Extracting train dataset', dynamic_ncols=True)
-        for item in tar:
+        
+        def extract_class(item, pbar):
             cls_name = item.name.strip(".tar")
             a = tar.extractfile(item)
             b = tarfile.open(fileobj=a, mode="r:")
             class_path = f"{TRAIN_DEST_DIR}/{cls_name}/"
-            if not os.path.isdir(class_path):
-                os.makedirs(class_path)
+            Path(class_path).mkdir(parents=True, exist_ok=True)
             pbar.set_postfix_str(f"Extracting {cls_name}")
             b.extractall(class_path)
             pbar.update(1)
-        pbar.close()
-
-
-def extract_val(src:str, dest:str):
-    with open(src, 'rb') as f:
-        tar = tarfile.open(fileobj=f, mode='r:')
-        if not os.path.isdir(dest):
-            os.makedirs(dest)
-        print("extract val dateset to >>>", dest)
-        names = tar.getnames()
-        pbar = tqdm(total=len(names), desc='Extracting val dataset', dynamic_ncols=True)
-        for name in names:
-            tar.extract(name, dest)
-            pbar.update(1)
-        pbar.close()
+    
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            pbar = tqdm(total=len(tar.getmembers()), desc='Extracting train dataset', dynamic_ncols=True)
+            for item in tar:
+                executor.submit(extract_class, item, pbar)
+            pbar.close()
 
 
 if __name__ == '__main__':
-    extract_train() # 137.7 GB cost 15:23
-    # use utils/extract_imagenet_val.py to extract val set
-    # extract_val(VAL_SRC_DIR, VAL_DEST_DIR) # 6.28 GB cost 4:41
-    # extract_val(TEST_SRC_DIR, TEST_DEST_DIR) # 12.74 GB cost 17:00
+    # base line
+    extract_train(16) # 137.7 GB cost 15:23
