@@ -2,16 +2,14 @@ import torch
 from torch import nn
 import lightning as L
 from torchvision.utils import make_grid
-from vqvae import VQVAE, Classifier
+from vqvae import VQVAE
 from sqate import SQATE
-import torchmetrics
 from mask import patch_mask
 
 __all__ = [
     'VQVAEUnmaskLightning',
     'VQVAELightning', 
     'SQATELightning',
-    'VQVAEFinetuneLightning'
 ]
 
 class VQVAEUnmaskLightning(L.LightningModule):
@@ -76,7 +74,6 @@ class VQVAEUnmaskLightning(L.LightningModule):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.hparams.lr)
         return optimizer
     
-
 
 class VQVAELightning(L.LightningModule):
     def __init__(
@@ -213,62 +210,3 @@ class SQATELightning(L.LightningModule):
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.hparams.lr)
         return optimizer
-
-class VQVAEFinetuneLightning(L.LightningModule):
-    def __init__(
-            self, 
-            model_path:str,
-            model_kwargs:dict, 
-            lr:float
-        ):
-        super().__init__()
-        self.save_hyperparameters()
-        model = VQVAE(**model_kwargs)
-        model.load_state_dict(torch.load(model_path))
-        model.decoder = Classifier(
-            in_channel=self.hparams.model_kwargs["hid_channel"], 
-            n_classes=10
-        )
-        # Freeze the VQVAE model
-        # for param in model.parameters():
-        #     param.requires_grad = False
-        # for param in model.decoder.parameters():
-        #     param.requires_grad = True
-        self.vqvae = model
-        self.loss_fn = nn.CrossEntropyLoss()
-        self.accuracy = torchmetrics.Accuracy(
-            task = "multiclass", 
-            num_classes = 10
-        )
-
-    def forward(self, x):
-        y, idxs = self.vqvae(x)
-        return y
-    
-    def training_step(self, batch, batch_idx):
-        loss, accuracy = self._common_step(batch, batch_idx)
-        self.log_dict({"train_loss": loss, "train_acc": accuracy}, 
-                      sync_dist=True, on_step=False, on_epoch=True, prog_bar=True)
-        return loss
-    
-    def validation_step(self, batch, batch_idx):
-        loss, accuracy = self._common_step(batch, batch_idx)
-        self.log_dict({"val_loss": loss, "val_acc": accuracy}, sync_dist=True)
-        return loss
-    
-    def test_step(self, batch, batch_idx):
-        loss, accuracy = self._common_step(batch, batch_idx)
-        self.log_dict({"test_loss": loss, "test_acc": accuracy}, sync_dist=True)
-        return loss
-
-    def _common_step(self, batch, batch_idx):
-        data, target = batch
-        logits = self(data)
-        loss = self.loss_fn(logits, target)
-        accuracy = self.accuracy(logits, target)
-        return loss, accuracy
-    
-    def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=self.hparams.lr)
-        return optimizer
-    

@@ -40,19 +40,7 @@ if __name__ == '__main__':
             mask_kwargs, 
             learning_rate
         )
-    elif model_name == 'VQVAE_finetune':
-        # model = VQVAEFinetuneLightning(
-        #     model_path = "ckpt/unmask_vqvae_cifar10_10epo.pth", 
-        #     model_kwargs = model_kwargs, 
-        #     lr = learning_rate
-        # )
-        model = VQVAEFinetuneLightning.load_from_checkpoint(
-            "ckpt/VQVAE_finetune_CIFAR10_lightning.pt",
-            model_path = "ckpt/unmask_vqvae_cifar10_10epo.pth", 
-            model_kwargs = model_kwargs, 
-            lr = learning_rate
-        )
-
+        
     logger = TensorBoardLogger("logs", name=f"{model_name}_{dataset_name}")
     
     trainer = L.Trainer(
