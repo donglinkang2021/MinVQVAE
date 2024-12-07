@@ -8,10 +8,12 @@ __all__ = ["SimpleQuantize"]
 class SimpleQuantize(nn.Module):
     def __init__(self, vocab_size:int, embd_dim:int):
         super().__init__()
+        self.ln = nn.LayerNorm(embd_dim)
         self.embd = nn.Embedding(vocab_size, embd_dim)
 
     def forward(self, input: Tensor):
         # [B, T, n_embed] @ [n_embed, vocab_size] -> [B, T, vocab_size]
+        input = self.ln(input)
         idxs = (input @ self.embd.weight.t()).argmax(-1) # [B, T]
         quantize = self.embd(idxs)
         quantize = input + (quantize - input).detach()

@@ -1,0 +1,8 @@
+defaults:
+  - dataset: imagenet
+  - model: vqvae
+  - train: default
+  - logger: tensorboard
+  - strategy: deepspeed
+  - trainer: default
+  - hydra: default

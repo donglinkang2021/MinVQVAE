@@ -1,0 +1,4 @@
+_target_: lightning.pytorch.loggers.TensorBoardLogger
+save_dir: /data1/linkdom/output/logs
+name: ${model._target_}_${dataset._target_}
+version: ${now:%Y-%m-%d-%H-%M-%S}

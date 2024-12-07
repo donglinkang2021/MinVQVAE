@@ -1,59 +1,18 @@
 import torch
-import lightning as L
-from lightning.pytorch.loggers import TensorBoardLogger
-from lightning.pytorch.strategies import DeepSpeedStrategy
-from light import *
-from datasets import *
-from config import *
+from lightning import LightningModule, LightningDataModule, Trainer
+import hydra
 
 torch.set_float32_matmul_precision('medium')
 
-if __name__ == '__main__':
-
-    if dataset_name == 'CIFAR10':
-        dm = CIFAR10DataModule(**dataset_kwargs)
-    elif dataset_name == 'MNIST':
-        dm = MNISTDataModule(**dataset_kwargs)
-    elif dataset_name == 'CelebA':
-        dm = CelebADataModule(**dataset_kwargs)
-    elif dataset_name == 'ImageNet':
-        dm = ImageNetDataModule(**dataset_kwargs)
-
-    if model_name == 'VQVAE_unmask':
-        model = VQVAEUnmaskLightning(
-            model_kwargs, 
-            vis_kwargs, 
-            learning_rate
-        )
-    elif model_name == 'VQVAE':
-        model = VQVAELightning(
-            model_kwargs, 
-            vis_kwargs, 
-            mask_kwargs, 
-            learning_rate
-        )
-    elif model_name == 'SQATE':
-        model = SQATELightning(
-            model_kwargs, 
-            transformer_kwargs, 
-            vis_kwargs, 
-            mask_kwargs, 
-            learning_rate
-        )
-        
-    logger = TensorBoardLogger("logs", name=f"{model_name}_{dataset_name}")
-    
-    trainer = L.Trainer(
-        accelerator="gpu",
-        strategy=DeepSpeedStrategy(),
-        devices=4,
-        # precision="16-mixed",
-        precision=32,
-        logger=logger,
-        num_nodes=1,
-        max_epochs=epochs,
-        profiler="simple"
-    )
+@hydra.main(config_path="configs", config_name="default", version_base=None)
+def main(cfg):
+    dm:LightningDataModule = hydra.utils.instantiate(cfg.dataset)
+    model:LightningModule = hydra.utils.instantiate(cfg.model)
+    trainer: Trainer = hydra.utils.instantiate(cfg.trainer)
     trainer.fit(model, dm)
-    trainer.validate(model, dm)
     trainer.test(model, dm)
+
+if __name__ == '__main__':
+    main()
+
+# python train.py

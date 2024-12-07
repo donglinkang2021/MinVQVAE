@@ -1,0 +1,5 @@
+_target_: minvqvae.datasets.mnist.MNISTDataModule
+data_dir: /data1/linkdom/data
+batch_size: 512
+num_workers: 4
+image_size: 32

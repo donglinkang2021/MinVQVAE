@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch import Tensor
-from quantize import SoftQuantize
+from .core.quantize import SoftQuantize
 from einops import rearrange
 from typing import Tuple
 
@@ -227,4 +227,6 @@ if __name__ == '__main__':
     )
     x = torch.randn(32, 3, 256, 256)
     y, idxs = model(x)
-    print(y.shape)
+    print(y.shape, idxs.shape)
+
+# python -m minvqvae.models.vqvae
