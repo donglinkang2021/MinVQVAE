@@ -1,7 +1,7 @@
 # Define the session name
-model="llmffnae"
-devices="4,5,6,7"
-# devices="0,1,2,3"
+model="smvqvae"
+# devices="4,5,6,7"
+devices="0,1,2,3"
 SESSION_NAME="exp-${model}-1"
 CONDA_NAME="linkdom"
 

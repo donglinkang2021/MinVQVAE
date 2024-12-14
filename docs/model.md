@@ -27,3 +27,5 @@ Next steps:
 2. The second version is smvqvae using softmax.
 3. Replace the trained FFN part of the llmffn with an untrained VQ part to see the effect.
 4. Perform few-shot fine-tuning, allowing only the layernorm part of the quantize module to be slightly trained, or not trained at all, to see the effect.
+
+I have reached the second step, but previously encountered some issues where the entire folder was too large due to storing images, resulting in 22GB of data for each experiment. Therefore, after renaming an experiment, tensorboard takes a long time to load the interface. Tomorrow, I can write a script to uniformly test the performance of each trained model on ImageNet eval and test.
