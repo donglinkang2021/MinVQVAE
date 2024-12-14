@@ -7,6 +7,7 @@ import math
 __all__ = ["SoftQuantize"]
 
 class SoftQuantize(nn.Module):
+    """softmax;embedding not updated"""
     def __init__(self, vocab_size:int, embd_dim:int):
         """
         Use the softmax to replace argmax in the `SimpleQuantize`
@@ -43,6 +44,7 @@ if __name__ == "__main__":
     loss = criterion(quantize, target)
     loss.backward()
     print("criterion(quantize, target)", loss.item())
+    print("embedding.weight.grad", vq.embd.weight.grad)
     print("input.grad", input.grad.shape)
     print("criterion(quantize, input)", criterion(quantize, input).item())
 

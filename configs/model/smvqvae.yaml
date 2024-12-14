@@ -1,4 +1,4 @@
-_target_: minvqvae.task.img2img.ffnae.FFNAELight
+_target_: minvqvae.task.img2img.smvqvae.AMVQVAELight
 model_kwargs:
   in_channel: 3
   hid_channel: 128

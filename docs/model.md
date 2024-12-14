@@ -18,3 +18,12 @@ Summary of experimental results:
 The results show that the FFN layer with dropout performs better than the FFN layer without dropout. However, the VQ model still outperforms the FFN layer with dropout.
 
 Moreover, the VQ model achieves the same effect as the FFN with only half the number of parameters, so we should indeed choose VQ as our model.
+
+An exciting discovery was made: it turns out that the weights of the previous VQ were never updated. This means that in the previous `VQVAE`, a module used `SoftQuantize`, and the embedding part of this module was never trained. Only the ln part was trained. Despite this, the module's performance was very close to the FFN in the LLM. This suggests that we could directly replace the FFN in the LLM with a normally distributed VQ, achieving excellent results without training, with half the parameters, and similar performance. Fine-tuning would be faster, making it almost unbeatable. Given the generality of the FFN, this approach could be applied in most cases.
+
+Next steps:
+
+1. Train the VQVAE with updated embedding parameters to see the effect. One version is amvqvae using argmax.
+2. The second version is smvqvae using softmax.
+3. Replace the trained FFN part of the llmffn with an untrained VQ part to see the effect.
+4. Perform few-shot fine-tuning, allowing only the layernorm part of the quantize module to be slightly trained, or not trained at all, to see the effect.

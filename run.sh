@@ -1,8 +1,8 @@
 # Define the session name
-model="ffnae"
+model="llmffnae"
 devices="4,5,6,7"
 # devices="0,1,2,3"
-SESSION_NAME="exp-${model}-0"
+SESSION_NAME="exp-${model}-1"
 CONDA_NAME="linkdom"
 
 # Create a new tmux session with the specified name
