@@ -1,5 +1,8 @@
 # Define the session name
-SESSION_NAME="exp-vqvae-1"
+model="ffnae"
+devices="4,5,6,7"
+# devices="0,1,2,3"
+SESSION_NAME="exp-${model}-0"
 CONDA_NAME="linkdom"
 
 # Create a new tmux session with the specified name
@@ -8,8 +11,8 @@ tmux new-session -d -s $SESSION_NAME
 # Create a new window for training the model
 tmux new-window -t ${SESSION_NAME}:1 -n 'train'
 tmux send-keys -t ${SESSION_NAME}:1 "conda activate ${CONDA_NAME}" C-m
-tmux send-keys -t ${SESSION_NAME}:1 "export CUDA_VISIBLE_DEVICES=4,5,6,7" C-m
-tmux send-keys -t ${SESSION_NAME}:1 "python train.py logger.name=${SESSION_NAME} dataset=celeba" C-m
+tmux send-keys -t ${SESSION_NAME}:1 "export CUDA_VISIBLE_DEVICES=${devices}" C-m
+tmux send-keys -t ${SESSION_NAME}:1 "python train.py logger.name=${SESSION_NAME} model=${model}" C-m
 
 # Create a new window for running tensorboard
 # tmux new-window -t ${SESSION_NAME}:2 -n 'tensorboard'
