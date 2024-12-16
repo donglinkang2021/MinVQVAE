@@ -4,5 +4,5 @@ defaults:
   - train: default
   - logger: tensorboard
   - strategy: deepspeed
-  - trainer: default
+  - trainer: train
   - hydra: default

@@ -1,4 +1,4 @@
 learning_rate: 3e-4
 epochs: 10
-batch_size: 256
+batch_size: 512
 num_workers: 4
