@@ -2,24 +2,19 @@ import torch
 from torch import nn
 import lightning as L
 from torchvision.utils import make_grid
-from ...models.core.mask import patch_mask
-from ...models.ffnae import FFNAE
+from .models.core.mask import patch_mask
 
-class FFNAELight(L.LightningModule):
+class Img2Img(L.LightningModule):
     def __init__(
-            self, 
-            model_kwargs:dict, 
-            vis_kwargs:dict, 
-            learning_rate:float,
-            mask_kwargs:dict = None
+            self, model:nn.Module,
         ):
         super().__init__()
         self.save_hyperparameters()
-        self.model = FFNAE(**model_kwargs)
+        self.model = model
         self.loss_fn = nn.MSELoss()
 
     def forward(self, x):
-        y = self.model(x)
+        y, idxs = self.model(x)
         return y
     
     def training_step(self, batch, batch_idx):
