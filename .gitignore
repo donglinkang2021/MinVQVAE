@@ -1,5 +1,4 @@
 .hypothesis
-.cache
 data
 __pycache__
 logs

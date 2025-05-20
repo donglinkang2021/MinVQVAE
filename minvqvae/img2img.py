@@ -2,14 +2,19 @@ import torch
 from torch import nn
 import lightning as L
 from torchvision.utils import make_grid
-from .models.core.mask import patch_mask
+from .core.mask import patch_mask
 
 class Img2Img(L.LightningModule):
     def __init__(
-            self, model:nn.Module,
+            self, model:nn.Module, 
+            vis_kwargs:dict, 
+            mask_kwargs:dict=None, 
+            learning_rate:float=3e-4
         ):
         super().__init__()
-        self.save_hyperparameters()
+        self.vis_kwargs = vis_kwargs
+        self.mask_kwargs = mask_kwargs
+        self.learning_rate = learning_rate
         self.model = model
         self.loss_fn = nn.MSELoss()
 
@@ -21,12 +26,6 @@ class Img2Img(L.LightningModule):
         loss, logits, data, data_masked = self._common_step(batch, batch_idx)
         self.log_dict({"train_loss": loss}, sync_dist=True,
                       on_step=False, on_epoch=True, prog_bar=True)
-        
-        if batch_idx % 100 == 0:
-            self._add_image(data, 'train_original')
-            self._add_image(data_masked, 'train_masked')
-            self._add_image(logits, 'train_recon')
-
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -48,9 +47,9 @@ class Img2Img(L.LightningModule):
     def _add_image(self, data:torch.Tensor, name:str):
         if data is None:
             return
-        n_sample = self.hparams.vis_kwargs['n_sample']
-        size = self.hparams.vis_kwargs['size']
-        in_channel = self.hparams.vis_kwargs['in_channel']
+        n_sample = self.vis_kwargs['n_sample']
+        size = self.vis_kwargs['size']
+        in_channel = self.vis_kwargs['in_channel']
         grid = make_grid(
             data[:n_sample].view(-1, in_channel, size, size)
         )
@@ -60,15 +59,15 @@ class Img2Img(L.LightningModule):
 
     def _common_step(self, batch, batch_idx):
         data, target = batch
-        if self.hparams.mask_kwargs is not None:
-            data_masked = patch_mask(data, **self.hparams.mask_kwargs)
+        if self.mask_kwargs is None:
+            data_masked = data
         else:
-            data_masked = None
+            data_masked = patch_mask(data, **self.mask_kwargs)
         logits = self(data_masked)
         loss = self.loss_fn(logits, data)
         return loss, logits, data, data_masked
     
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=self.hparams.learning_rate)
+        optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
         return optimizer
     

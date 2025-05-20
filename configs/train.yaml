@@ -1,6 +1,6 @@
 defaults:
   - dataset: imagenet
-  - model: vqvae
+  - task: img2img
   - train: default
   - logger: tensorboard
   - strategy: deepspeed
