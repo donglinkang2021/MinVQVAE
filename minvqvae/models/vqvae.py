@@ -2,19 +2,8 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch import Tensor
-from .core.quantize import SoftQuantize
 from einops import rearrange
 from typing import Tuple
-
-__all__ = [
-    'VQVAE', 
-    'Encoder', 
-    'Decoder', 
-    'ResBlock', 
-    'SubSampleBlock', 
-    'SubsampleTransposeBlock',
-    'Classifier'
-]
 
 class ResBlock(nn.Module):
     def __init__(self, in_channel:int, _channel:int):
@@ -165,12 +154,11 @@ class VQVAE(nn.Module):
         hid_channel:int,
         n_res_block:int,
         n_res_channel:int,
-        embed_dim:int,
-        n_embed:int,
-        scale_factor:int
+        scale_factor:int,
+        quantize:nn.Module
     ):
         super().__init__()
-
+        embd_dim = quantize.embd_dim
         self.encoder = Encoder(
             in_channel, 
             hid_channel, 
@@ -178,12 +166,9 @@ class VQVAE(nn.Module):
             n_res_channel, 
             scale_factor
         )
-        self.enc_out = nn.Conv2d(hid_channel, embed_dim, 1)
-        self.quantize = SoftQuantize(
-            vocab_size=n_embed, 
-            embd_dim=embed_dim
-        )
-        self.dec_in = nn.Conv2d(embed_dim, hid_channel, 1)
+        self.enc_out = nn.Conv2d(hid_channel, embd_dim, 1)
+        self.quantize = quantize
+        self.dec_in = nn.Conv2d(embd_dim, hid_channel, 1)
         self.decoder = Decoder(
             hid_channel,
             in_channel,
@@ -198,14 +183,14 @@ class VQVAE(nn.Module):
         enc = self.encoder(input)
 
         # enc: (B, hid_channel, H//2^s, W//2^s) 
-        # -> enc: (B, H//2^s, W//2^s, embed_dim)        
+        # -> enc: (B, H//2^s, W//2^s, embd_dim)        
         enc = self.enc_out(enc)
         _, _, H, W = enc.shape
         enc = rearrange(enc, 'b c h w -> b (h w) c')
         
         quant, idxs = self.quantize(enc)
 
-        # quant: (B, H//2^s, W//2^s, embed_dim)
+        # quant: (B, H//2^s, W//2^s, embd_dim)
         # -> quant: (B, hid_channel, H//2^s, W//2^s)
         quant = rearrange(quant, 'b (h w) c -> b c h w', h=H, w=W)
         quant = self.dec_in(quant)
@@ -216,14 +201,17 @@ class VQVAE(nn.Module):
         return dec, idxs
 
 if __name__ == '__main__':
+    from ..core import SoftmaxQuantize
     model = VQVAE(
         in_channel=3,
         hid_channel=128,
         n_res_block=2,
         n_res_channel=32,
-        embed_dim=64,
-        n_embed=512,
-        scale_factor=2
+        scale_factor=2,
+        quantize=SoftmaxQuantize(
+            n_embed=512,
+            embd_dim=64
+        )
     )
     x = torch.randn(32, 3, 256, 256)
     y, idxs = model(x)
