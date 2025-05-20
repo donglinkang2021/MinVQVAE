@@ -8,14 +8,14 @@ __all__ = ["SoftmaxQuantize"]
 
 class SoftmaxQuantize(nn.Module):
     """softmax;embedding updated"""
-    def __init__(self, vocab_size:int, embd_dim:int):
+    def __init__(self, n_embed:int, embd_dim:int):
         super().__init__()
         self.embd_dim = embd_dim
         self.ln = nn.LayerNorm(embd_dim)
-        self.embd = nn.Embedding(vocab_size, embd_dim)
+        self.embd = nn.Embedding(n_embed, embd_dim)
 
     def forward(self, input: Tensor):
-        # [B, T, n_embed] @ [n_embed, vocab_size] -> [B, T, vocab_size]
+        # [B, T, n_embed] @ [n_embed, n_embed] -> [B, T, n_embed]
         input = self.ln(input)
         probs = (input @ self.embd.weight.t() / math.sqrt(self.embd_dim)).softmax(-1)
         idxs = probs.argmax(-1)
@@ -28,10 +28,10 @@ if __name__ == "__main__":
     B = 2
     T = 100
     embd_dim = 128
-    vocab_size = 32
+    n_embed = 32
     input = torch.randn(B, T, embd_dim, requires_grad=True)
     target = torch.randn(B, T, embd_dim)
-    vq = SoftmaxQuantize(vocab_size, embd_dim)
+    vq = SoftmaxQuantize(n_embed, embd_dim)
     quantize, idxs = vq(input)
     criterion = nn.MSELoss()
     loss = criterion(quantize, target)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     n_vectors = B * T
     original_size = n_vectors * embd_dim
 
-    compressed_size = vocab_size * embd_dim + n_vectors
+    compressed_size = n_embed * embd_dim + n_vectors
     compression_ratio = compressed_size / original_size
     print(f"Compression Ratio: {compression_ratio * 100:.2f}%")
 
