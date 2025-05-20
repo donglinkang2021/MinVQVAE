@@ -90,10 +90,10 @@ if __name__ == "__main__":
     T = 100
     embd_dim = 128
     g_head = 16
-    vocab_size = 32
+    n_embed = 32
     input = torch.randn(B, T, embd_dim, requires_grad=True)
     target = torch.randn(B, T, embd_dim)
-    vq = ProductQuantize(vocab_size, g_head, embd_dim)
+    vq = ProductQuantize(n_embed, g_head, embd_dim)
     quantize, idxs = vq(input)
     criterion = nn.MSELoss()
     loss = criterion(quantize, target)
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     original_size = n_vectors * embd_dim
 
     head_size = embd_dim // g_head
-    compressed_size = g_head * vocab_size * head_size + g_head * n_vectors
+    compressed_size = g_head * n_embed * head_size + g_head * n_vectors
     compression_ratio = compressed_size / original_size
     print(f"Compression Ratio: {compression_ratio * 100:.2f}%")
 
