@@ -30,3 +30,11 @@ class LLMFFN(nn.Module):
         x = self.c_proj(x)
         x = self.dropout(x)
         return x, None
+
+class Identity(nn.Module):
+    def __init__(self, embd_dim:int, n_embed:int):
+        super().__init__()
+        self.embd_dim = embd_dim
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x, None

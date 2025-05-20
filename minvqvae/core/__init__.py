@@ -13,4 +13,5 @@ from .quantize import (
 from .ffn import (
     LLMFFN,
     FFN,
+    Identity
 )
