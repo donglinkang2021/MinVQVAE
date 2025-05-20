@@ -12,7 +12,7 @@ model:
     embd_dim: 64
 
 vis_kwargs:
-  n_sample: 6
+  n_sample: 32
   size: ${dataset.image_size}
   in_channel: ${task.model.in_channel}
 

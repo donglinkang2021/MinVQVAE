@@ -33,17 +33,19 @@ class Img2Img(L.LightningModule):
     def validation_step(self, batch, batch_idx):
         loss, logits, data, data_masked = self._common_step(batch, batch_idx)
         self.log_dict({"val_loss": loss}, sync_dist=True)
-        self._add_image(data, 'val_original')
-        self._add_image(data_masked, 'val_masked')
-        self._add_image(logits, 'val_recon')
+        if batch_idx == 0:
+            self._add_image(data, 'val_original')
+            self._add_image(data_masked, 'val_masked')
+            self._add_image(logits, 'val_recon')
         return loss
     
     def test_step(self, batch, batch_idx):
         loss, logits, data, data_masked = self._common_step(batch, batch_idx)
         self.log_dict({"test_loss": loss}, sync_dist=True)
-        self._add_image(data, 'test_original')
-        self._add_image(data_masked, 'test_masked')
-        self._add_image(logits, 'test_recon')
+        if batch_idx == 0:
+            self._add_image(data, 'test_original')
+            self._add_image(data_masked, 'test_masked')
+            self._add_image(logits, 'test_recon')
         return loss
     
     def _add_image(self, data:torch.Tensor, name:str):
