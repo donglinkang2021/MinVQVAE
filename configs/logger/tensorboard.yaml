@@ -1,4 +1,6 @@
 _target_: lightning.pytorch.loggers.TensorBoardLogger
-save_dir: /data1/linkdom/output/MinVQVAE/logs
-name: ${task.model._target_}_${dataset._target_}
-version: ${now:%Y-%m-%d-%H-%M-%S}
+save_dir: ${paths.log_dir}/tensorboard/
+name: null
+log_graph: False
+default_hp_metric: True
+prefix: ""

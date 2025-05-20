@@ -1,7 +1,9 @@
 import torch
 from torch import nn
 import lightning as L
+from lightning.pytorch import loggers
 from torchvision.utils import make_grid
+import wandb
 from .core.mask import patch_mask
 
 class Img2Img(L.LightningModule):
@@ -25,7 +27,7 @@ class Img2Img(L.LightningModule):
     def training_step(self, batch, batch_idx):
         loss, logits, data, data_masked = self._common_step(batch, batch_idx)
         self.log_dict({"train_loss": loss}, sync_dist=True,
-                      on_step=False, on_epoch=True, prog_bar=True)
+                      on_step=True, on_epoch=True, prog_bar=True)
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -53,9 +55,16 @@ class Img2Img(L.LightningModule):
         grid = make_grid(
             data[:n_sample].view(-1, in_channel, size, size)
         )
-        self.logger.experiment.add_image(
-            name, grid, global_step=self.global_step
-        )
+        if isinstance(self.logger, loggers.TensorBoardLogger):
+            # for tensorboard
+            self.logger.experiment.add_image(
+                name, grid, global_step=self.global_step
+            )
+        elif isinstance(self.logger, loggers.WandbLogger):
+            # for wandb
+            self.logger.experiment.log({
+                name: wandb.Image(grid, caption=name)
+            }, step=self.global_step)
 
     def _common_step(self, batch, batch_idx):
         data, target = batch
