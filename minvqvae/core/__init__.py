@@ -6,6 +6,7 @@ from .quantize import (
     # direct updated embedding
     SoftmaxQuantize,
     ArgmaxQuantize,
+    AttentionQuantize,
     # cached update embedding (Implement Later)
 )
 
