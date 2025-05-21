@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print(f"Compression Ratio: {compression_ratio * 100:.2f}%")
 
 # test it with:
-# python minvqvae/models/core/quantize/ArgmaxQuantize.py
+# python minvqvae/core/quantize/ArgmaxQuantize.py
 """
 criterion(quantize, target) 2.036546468734741
 embedding.weight.grad torch.Size([32, 128])
