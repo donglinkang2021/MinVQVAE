@@ -58,5 +58,5 @@ $$
 
 So in the code, it can usually be written in one line:
 ```python
-kl_loss = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
+kl_loss = 0.5 * torch.sum(mu**2 + torch.exp(log_var) - log_var - 1, dim=1).mean()
 ```

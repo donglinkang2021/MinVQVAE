@@ -5,7 +5,7 @@ export CUDA_VISIBLE_DEVICES=0,1
 python train.py \
     dataset=mnist \
     model.in_channel=1 \
-    model.hidden_dims="[32,64,128,256,512]" \
+    model.hidden_dims="[32,64,128,256]" \
     task_name=img2img-vae-mnist
 
 python train.py \
