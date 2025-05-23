@@ -1,0 +1,3 @@
+_target_: minvqvae.models.VanillaVAE
+in_channel: 3
+latent_dim: 64
