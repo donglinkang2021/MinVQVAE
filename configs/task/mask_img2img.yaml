@@ -1,0 +1,13 @@
+_target_: minvqvae.img2img.Img2Img
+model: ${model}
+
+vis_kwargs:
+  n_sample: 32
+  size: ${dataset.image_size}
+  in_channel: ${model.in_channel}
+
+learning_rate: ${train.learning_rate}
+
+mask_kwargs:
+  mask_prob: 0.5
+  patch_size: 32

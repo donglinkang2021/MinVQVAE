@@ -1,20 +1,10 @@
-_target_: minvqvae.task.img2img.vqvae.VQVAELight
-model_kwargs:
-  in_channel: 3
-  hid_channel: 128
-  n_res_block: 2
-  n_res_channel: 32
-  embed_dim: 64
+_target_: minvqvae.models.VQVAE
+in_channel: 3
+hid_channel: 128
+n_res_block: 2
+n_res_channel: 32
+scale_factor: 1
+quantize:
+  _target_: minvqvae.core.SoftmaxQuantize
   n_embed: 512
-  scale_factor: 1
-
-vis_kwargs:
-  n_sample: 32
-  size: ${dataset.image_size}
-  in_channel: ${model.model_kwargs.in_channel}
-
-learning_rate: ${train.learning_rate}
-
-mask_kwargs:
-  mask_prob: 0.5
-  patch_size: 32
+  embd_dim: 64

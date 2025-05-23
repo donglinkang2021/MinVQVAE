@@ -1,5 +1,5 @@
 _target_: minvqvae.datasets.imagenet.ImageNetDataModule
-data_dir: /data1/linkdom/data/ImageNet
-batch_size: 256
-num_workers: 4
+data_dir: ${paths.data_dir}/ImageNet
+batch_size: ${train.batch_size}
+num_workers: ${train.num_workers}
 image_size: 256

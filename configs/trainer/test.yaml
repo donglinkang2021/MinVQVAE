@@ -1,0 +1,6 @@
+_target_: lightning.Trainer
+accelerator: gpu
+devices: 2
+precision: 32
+max_epochs: ${train.epochs}
+num_nodes: 1

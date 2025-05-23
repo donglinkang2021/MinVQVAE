@@ -1,0 +1,9 @@
+defaults:
+  - dataset: imagenet
+  - task: img2img
+  - train: test
+  - strategy: deepspeed
+  - trainer: test
+
+log_dir: /data1/linkdom/output/MinVQVAE/logs
+exp_model_name: exp-vqvae-imagenet-0/2024-12-07-22-50-03

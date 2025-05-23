@@ -42,4 +42,17 @@ def main():
 if __name__ == "__main__":
     main()
 
-# python check_datasets.py
+# python utils/check_datasets.py
+# MNIST train dataset: 60000
+# MNIST test dataset: 10000
+# Files already downloaded and verified
+# Files already downloaded and verified
+# CIFAR10 train dataset: 50000
+# CIFAR10 test dataset: 10000
+# Files already downloaded and verified
+# CelebA dataset: 202599
+# CelebA Train dataset: 162770
+# CelebA Valid dataset: 19867
+# CelebA Test dataset: 19962
+# ImageNet train dataset: 1281167
+# ImageNet val dataset: 50000

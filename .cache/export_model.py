@@ -1,6 +1,6 @@
 import torch
 import lightning as L
-from minvqvae.task.img2img.vqvae import VQVAELight
+from minvqvae.img2img import Img2Img
 from config import *
 from lightning.pytorch.utilities.deepspeed import convert_zero_checkpoint_to_fp32_state_dict
 from minvqvae.models.vqvae import VQVAE
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     output_path = "ckpt/VQVAE_imagenet_lightning.pt"
     convert_zero_checkpoint_to_fp32_state_dict(save_path, output_path)
 
-    model = VQVAELight.load_from_checkpoint(
+    model = Img2Img.load_from_checkpoint(
         "ckpt/VQVAE_imagenet_lightning.pt", 
         hparams_file="logs/VQVAE_unmask_ImageNet/version_3/hparams.yaml"
     )

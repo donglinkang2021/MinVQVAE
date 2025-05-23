@@ -1,0 +1,3 @@
+out_dir: /data1/linkdom/output/MinVQVAE
+log_dir: ${paths.out_dir}/logs
+data_dir: /data1/linkdom/data

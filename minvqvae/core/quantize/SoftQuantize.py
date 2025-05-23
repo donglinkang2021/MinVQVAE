@@ -7,20 +7,21 @@ import math
 __all__ = ["SoftQuantize"]
 
 class SoftQuantize(nn.Module):
-    def __init__(self, vocab_size:int, embd_dim:int):
+    """softmax;embedding not updated"""
+    def __init__(self, n_embed:int, embd_dim:int):
         """
         Use the softmax to replace argmax in the `SimpleQuantize`
         """
         super().__init__()
         self.embd_dim = embd_dim
         self.ln = nn.LayerNorm(embd_dim)
-        self.embd = nn.Embedding(vocab_size, embd_dim)
+        self.embd = nn.Embedding(n_embed, embd_dim)
 
     def forward(self, input: Tensor):
         # layer norm 
         # magic code, get crazy performance
         input = self.ln(input)
-        # [B, T, n_embed] @ [n_embed, vocab_size] -> [B, T, vocab_size]
+        # [B, T, n_embed] @ [n_embed, n_embed] -> [B, T, n_embed]
         probs = (input @ self.embd.weight.t() / math.sqrt(self.embd_dim)).softmax(-1)
         idxs = probs.argmax(-1)
         
@@ -34,15 +35,16 @@ if __name__ == "__main__":
     B = 2
     T = 100
     embd_dim = 128
-    vocab_size = 32
+    n_embed = 32
     input = torch.randn(B, T, embd_dim, requires_grad=True)
     target = torch.randn(B, T, embd_dim)
-    vq = SoftQuantize(vocab_size, embd_dim)
+    vq = SoftQuantize(n_embed, embd_dim)
     quantize, idxs = vq(input)
     criterion = nn.MSELoss()
     loss = criterion(quantize, target)
     loss.backward()
     print("criterion(quantize, target)", loss.item())
+    print("embedding.weight.grad", vq.embd.weight.grad)
     print("input.grad", input.grad.shape)
     print("criterion(quantize, input)", criterion(quantize, input).item())
 
@@ -51,12 +53,12 @@ if __name__ == "__main__":
     n_vectors = B * T
     original_size = n_vectors * embd_dim
 
-    compressed_size = vocab_size * embd_dim + n_vectors
+    compressed_size = n_embed * embd_dim + n_vectors
     compression_ratio = compressed_size / original_size
     print(f"Compression Ratio: {compression_ratio * 100:.2f}%")
 
 # test it with:
-# python quantize/SoftQuantize.py
+# python minvqvae/core/quantize/SoftQuantize.py
 """
 criterion(quantize, target) 1.056573510169983
 input.grad torch.Size([2, 100, 128])

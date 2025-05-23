@@ -1,5 +1,5 @@
 _target_: minvqvae.datasets.mnist.MNISTDataModule
-data_dir: /data1/linkdom/data
-batch_size: 512
-num_workers: 4
+data_dir: ${paths.data_dir}
+batch_size: ${train.batch_size}
+num_workers: ${train.num_workers}
 image_size: 32

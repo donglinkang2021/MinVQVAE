@@ -1,22 +1,30 @@
-# Define the session name
-SESSION_NAME="exp-vqvae-0"
-CONDA_NAME="linkdom"
+tmux new-session -s "linkdom-vqvae"
 
-# Create a new tmux session with the specified name
-tmux new-session -d -s $SESSION_NAME
+conda activate linkdom
+export CUDA_VISIBLE_DEVICES=0,1
+python train.py task.model.quantize._target_="minvqvae.core.SoftmaxQuantize"
+python train.py task.model.quantize._target_="minvqvae.core.FFN"
+python train.py task.model.quantize._target_="minvqvae.core.AttentionQuantize"
 
-# Create a new window for training the model
-tmux new-window -t ${SESSION_NAME}:1 -n 'train'
-tmux send-keys -t ${SESSION_NAME}:1 "conda activate ${CONDA_NAME}" C-m
-tmux send-keys -t ${SESSION_NAME}:1 "python train.py logger.name=${SESSION_NAME}" C-m
+conda activate linkdom
+export CUDA_VISIBLE_DEVICES=2,3
+python train.py task.model.quantize._target_="minvqvae.core.ArgmaxQuantize"
+python train.py task.model.quantize._target_="minvqvae.core.LLMFFN"
+python train.py \
+    task.model.quantize._target_="minvqvae.core.SoftmaxQuantize" \
+    task.model.scale_factor=2
 
-# Create a new window for running tensorboard
-tmux new-window -t ${SESSION_NAME}:2 -n 'tensorboard'
-tmux send-keys -t ${SESSION_NAME}:2 "conda activate ${CONDA_NAME}" C-m
-tmux send-keys -t ${SESSION_NAME}:2 "tensorboard --logdir=/data1/linkdom/output/logs --bind_all" C-m
+conda activate linkdom
+export CUDA_VISIBLE_DEVICES=4,5
+python train.py task.model.quantize._target_="minvqvae.core.SoftQuantize"
+python train.py task.model.quantize._target_="minvqvae.core.Identity"
+python train.py \
+    task.model.quantize._target_="minvqvae.core.Identity" \
+    task.model.scale_factor=2
 
-# Select the first window by default
-tmux select-window -t ${SESSION_NAME}:1
-
-# Attach to the tmux session
-tmux attach-session -t $SESSION_NAME
+conda activate linkdom
+export CUDA_VISIBLE_DEVICES=6,7
+python train.py task.model.quantize._target_="minvqvae.core.SimpleQuantize"
+python train.py \
+    task.model.quantize._target_="minvqvae.core.AttentionQuantize" \
+    task.model.scale_factor=2

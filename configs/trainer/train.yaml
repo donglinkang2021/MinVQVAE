@@ -2,7 +2,7 @@ _target_: lightning.Trainer
 accelerator: gpu
 logger: ${logger}
 strategy: ${strategy}
-devices: 4
+devices: 2
 precision: 32
 max_epochs: ${train.epochs}
 num_nodes: 1
