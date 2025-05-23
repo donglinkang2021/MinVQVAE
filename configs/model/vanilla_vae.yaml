@@ -1,3 +1,10 @@
 _target_: minvqvae.models.VanillaVAE
 in_channel: 3
 latent_dim: 64
+img_size: ${dataset.image_size}
+hidden_dims:
+  - 32
+  - 64
+  - 128
+  - 256
+  - 512

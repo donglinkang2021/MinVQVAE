@@ -3,6 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 from torch import Tensor
 from typing import List
+from einops import rearrange
 
 class Encoder(nn.Module):
     def __init__(self, in_channel:int, hidden_dims:List[int]):
@@ -12,8 +13,7 @@ class Encoder(nn.Module):
             blocks.append(
                 nn.Sequential(
                     nn.Conv2d(in_channel, h_dim, 3, 2, 1),
-                    nn.BatchNorm2d(h_dim),
-                    nn.LeakyReLU()
+                    nn.ReLU(inplace=True)
                 )
             )
             in_channel = h_dim
@@ -23,20 +23,22 @@ class Encoder(nn.Module):
         return self.blocks(input)
     
 class Decoder(nn.Module):
-    def __init__(self, hidden_dims:List[int]):
+    def __init__(self, hidden_dims:List[int], out_channel:int):
         super().__init__()
         blocks = []
         in_channel = hidden_dims[0]
-        hidden_dims = hidden_dims[1:] + [hidden_dims[-1]]
+        hidden_dims = hidden_dims[1:]
         for h_dim in hidden_dims:
             blocks.append(
                 nn.Sequential(
                     nn.ConvTranspose2d(in_channel, h_dim, 3, 2, 1, 1),
-                    nn.BatchNorm2d(h_dim),
-                    nn.LeakyReLU()
+                    nn.ReLU(inplace=True)
                 )
             )
             in_channel = h_dim
+        blocks.append(
+            nn.ConvTranspose2d(in_channel, out_channel, 3, 2, 1, 1)
+        )
         self.blocks = nn.Sequential(*blocks)
 
     def forward(self, input:Tensor) -> Tensor:
@@ -46,43 +48,41 @@ class VanillaVAE(nn.Module):
     def __init__(self,
             in_channel: int,
             latent_dim: int,
+            img_size:int = 256,
+            hidden_dims:List[int] = [32, 64, 128, 256, 512]
         ) -> None:
-        # assuming image size is 64x64
+        # assuming image size is img_size x img_size 
+        self.feat_size = img_size // (2**len(hidden_dims))
+        feat_channel = hidden_dims[-1]
         super(VanillaVAE, self).__init__()
         self.latent_dim = latent_dim
-        hidden_dims = [32, 64, 128, 256, 512]
+        self.feat_channel = feat_channel
         self.encoder = Encoder(in_channel, hidden_dims)
-        flatten_size = hidden_dims[-1]*4
-        self.fc_mu = nn.Linear(flatten_size, latent_dim)
-        self.fc_var = nn.Linear(flatten_size, latent_dim)
-        self.decoder_input = nn.Linear(latent_dim, flatten_size)
+        self.fc_mu = nn.Linear(feat_channel, latent_dim)
+        self.fc_var = nn.Linear(feat_channel, latent_dim)
+        self.dec_in = nn.Linear(latent_dim, feat_channel)
         hidden_dims.reverse()
-        self.decoder = Decoder(hidden_dims)
-        self.final_layer = nn.Sequential(
-            nn.Conv2d(hidden_dims[-1], in_channel, 3, 1, 1),
-            nn.Tanh()
-        )
+        self.decoder = Decoder(hidden_dims, in_channel)
 
     def encode(self, input: Tensor) -> List[Tensor]:
         # input: batch of images (B,C,H,W)
-        result = self.encoder(input) # (B,sC,sH,sW)
-        result = torch.flatten(result, start_dim=1) # (B,CxsHxsW)
-        mu = self.fc_mu(result) # (B,D)
-        log_var = self.fc_var(result) # (B,D)
-        return [mu, log_var]
+        z = self.encoder(input) # (B,fC,fH,fW)
+        z = rearrange(z, 'b c h w -> b h w c') # (B,fH,fW,fC)
+        mu = self.fc_mu(z) # (B,fH,fW,D)
+        log_var = self.fc_var(z) # (B,fH,fW,D)
+        return mu, log_var
 
     def decode(self, z: Tensor) -> Tensor:
-        # z: latent codes (B,D)
-        result = self.decoder_input(z) # (B,CxsHxsW)
-        result = result.view(-1, 512, 2, 2) # (B,sC,sH,sW)
+        # z: latent codes (B,fH,fW,D)
+        result = self.dec_in(z) # (B,fCxfHxfW)
+        result = result.view(-1, self.feat_channel, self.feat_size, self.feat_size) # (B,fC,fH,fW)
         result = self.decoder(result)
-        result = self.final_layer(result) # (B,C,H,W)
         return result
 
     def reparameterize(self, mu: Tensor, logvar: Tensor) -> Tensor:
-        # mu: (B,D) logvar: (B,D)
-        std = torch.exp(0.5 * logvar) # (B,D)
-        eps = torch.randn_like(std) # (B,D)
+        # mu: (B,fH,fW,D) logvar: (B,fH,fW,D)
+        std = torch.exp(0.5 * logvar) # (B,fH,fW,D)
+        eps = torch.randn_like(std) # (B,fH,fW,D)
         return eps * std + mu
 
     def forward(self, input: Tensor) -> List[Tensor]:
@@ -95,13 +95,15 @@ class VanillaVAE(nn.Module):
         return recons, loss
 
 if __name__ == '__main__':
-    x = torch.randn(32, 3, 64, 64)
+    img_size = 256
+    x = torch.randn(32, 3, img_size, img_size)
     model = VanillaVAE(
         in_channel=3,
-        latent_dim=128
+        latent_dim=128,
+        img_size=img_size
     )
     recons, loss = model(x)
-    print(recons.shape) # (32, 3, 64, 64)
+    print(recons.shape) # (32, 3, img_size, img_size)
     print(loss) # scalar
 
 # python -m minvqvae.models.vanilla_vae
