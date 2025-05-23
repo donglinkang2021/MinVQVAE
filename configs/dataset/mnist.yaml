@@ -2,4 +2,4 @@ _target_: minvqvae.datasets.mnist.MNISTDataModule
 data_dir: ${paths.data_dir}
 batch_size: ${train.batch_size}
 num_workers: ${train.num_workers}
-image_size: 32
+image_size: 64
