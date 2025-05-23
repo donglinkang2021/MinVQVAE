@@ -3,6 +3,7 @@ defaults:
   - _self_
   - dataset: imagenet
   - task: img2img
+  - model: vqvae
   - train: default
   - logger: wandb
   - strategy: deepspeed

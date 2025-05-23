@@ -1,0 +1,10 @@
+_target_: minvqvae.models.VQVAE
+in_channel: 3
+hid_channel: 128
+n_res_block: 2
+n_res_channel: 32
+scale_factor: 1
+quantize:
+  _target_: minvqvae.core.SoftmaxQuantize
+  n_embed: 512
+  embd_dim: 64
