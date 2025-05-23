@@ -197,8 +197,9 @@ class VQVAE(nn.Module):
 
         # quant: (B, hid_channel, H//2^s, W//2^s)
         # -> dec: (B, in_channel, H, W)
-        dec = self.decoder(quant)
-        return dec, idxs
+        recons = self.decoder(quant)
+        recon_loss = F.mse_loss(recons, input)
+        return recons, recon_loss
 
 if __name__ == '__main__':
     from ..core import SoftmaxQuantize
@@ -214,7 +215,7 @@ if __name__ == '__main__':
         )
     )
     x = torch.randn(32, 3, 256, 256)
-    y, idxs = model(x)
-    print(y.shape, idxs.shape)
+    y, loss = model(x)
+    print(y.shape, loss)
 
 # python -m minvqvae.models.vqvae
