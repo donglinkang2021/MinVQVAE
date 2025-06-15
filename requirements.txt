@@ -1,0 +1,6 @@
+torch
+lightning
+hydra_colorlog
+wandb
+swanlab
+deepspeed

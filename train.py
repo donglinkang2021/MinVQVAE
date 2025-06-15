@@ -1,4 +1,5 @@
 # import debugpy; debugpy.connect(('0.0.0.0', 5678))
+import swanlab; swanlab.sync_wandb(wandb_run=False)
 import torch
 from lightning import LightningModule, LightningDataModule, Trainer
 import hydra
